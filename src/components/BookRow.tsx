@@ -1,5 +1,5 @@
-import * as mq from 'styles/media-queries'
-import * as colors from 'styles/colors'
+import * as mq from '@/styles/media-queries'
+import * as colors from '@/styles/colors'
 import { Book } from '@/types/book'
 
 interface BookRowProps {
