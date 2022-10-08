@@ -1,8 +1,9 @@
 import { Logo } from '@/components/Logo'
 import React from 'react'
-import LoginForm, { LoginFormField } from '@/components/LoginForm'
+import LoginForm from '@/components/LoginForm'
 import { Button } from '@/components/lib'
 import { Modal, ModalContents, ModalOpenButton } from '@/components/Modal'
+import { LoginFormField, User } from '@/types/user'
 
 enum DialogState {
   'none',
@@ -10,16 +11,19 @@ enum DialogState {
   'register',
 }
 
-const Auth = () => {
+interface UnauthenticatedAppProps {
+  login: (formData: LoginFormField) => Promise<void>
+  register: (formData: LoginFormField) => Promise<void>
+}
+
+const UnauthenticatedApp: React.FC<UnauthenticatedAppProps> = ({
+  login,
+  register,
+}) => {
   const [openModal, setOpenModal] = React.useState<DialogState>(
     DialogState.none,
   )
-  const login: (formData: LoginFormField) => void = (formData) => {
-    console.log('login', formData)
-  }
-  const register: (formData: LoginFormField) => void = (formData) => {
-    console.log('register', formData)
-  }
+
   return (
     <div
       css={{
@@ -64,4 +68,4 @@ const Auth = () => {
   )
 }
 
-export { Auth }
+export { UnauthenticatedApp }

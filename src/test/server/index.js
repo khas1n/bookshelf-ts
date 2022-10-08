@@ -6,9 +6,9 @@
 // https://github.com/kentcdodds/bookshelf/blob/aef4f122428718ff422e203c6a68301dca50b396/src/test/server/index.js
 
 if (import.meta.env.DEV) {
-  import('./dev-server')
+  await import('./dev-server')
 } else if (import.meta.env.NODE_ENV === 'test') {
-  import('./test-server')
+  await import('./test-server')
 } else {
   // in normal apps you'll not do anything in this case
   // but for this workshop app, we're actually going to
@@ -19,5 +19,5 @@ if (import.meta.env.DEV) {
 
   // but for us, since we're shipping the dev server to prod
   // we'll do the same thing we did for development:
-  import('./dev-server')
+  await import('./dev-server')
 }

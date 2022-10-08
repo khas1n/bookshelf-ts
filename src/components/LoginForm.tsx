@@ -1,13 +1,10 @@
+import { LoginFormField, User } from '@/types/user'
+import { useAsync } from '@/utils/hooks'
 import React from 'react'
-import { FormGroup, Input, Spinner } from './lib'
-
-export interface LoginFormField {
-  username: string
-  password: string
-}
+import { ErrorMessage, FormGroup, Input, Spinner } from './lib'
 
 interface LoginFormProps {
-  onSubmit: (formData: LoginFormField) => void
+  onSubmit: (formData: LoginFormField) => Promise<void>
   submitButton: JSX.Element
 }
 
@@ -15,6 +12,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onSubmit,
   submitButton,
 }) => {
+  const { isLoading, isError, error, run } = useAsync()
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const target = e.target as typeof e.target & {
@@ -23,7 +21,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     }
     const username = target.username.value
     const password = target.password.value
-    onSubmit({ username, password })
+    run(onSubmit({ username, password }))
   }
   return (
     <form
@@ -48,9 +46,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <Input type="password" id="password" />
       </FormGroup>
       <div>
-        {React.cloneElement(submitButton, { type: 'submit' })}
-        <Spinner />
+        {React.cloneElement(
+          submitButton,
+          { type: 'submit' },
+          ...(Array.isArray(submitButton.props.children)
+            ? submitButton.props.children
+            : [submitButton.props.children]),
+          isLoading ? <Spinner css={{ marginLeft: 5 }} /> : null,
+        )}
       </div>
+      {isError && error ? <ErrorMessage error={error} /> : null}
     </form>
   )
 }
