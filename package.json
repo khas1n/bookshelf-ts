@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "http://localhost:5173/",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -13,11 +14,15 @@
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
     "@reach/dialog": "^0.17.0",
+    "@reach/menu-button": "^0.17.0",
+    "@reach/tooltip": "^0.17.0",
     "@reach/visually-hidden": "^0.17.0",
     "bootstrap": "^5.2.2",
+    "msw": "^0.47.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-icons": "^4.4.0"
+    "react-icons": "^4.4.0",
+    "react-router-dom": "^6.4.2"
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.10.2",
@@ -30,10 +35,15 @@
     "eslint": "^8.25.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "match-sorter": "^6.3.1",
+    "node-match-path": "^0.6.3",
     "prettier": "^2.7.1",
     "sass": "^1.55.0",
     "typescript": "^4.6.4",
     "vite": "^3.1.0",
     "vite-plugin-babel-macros": "^1.0.6"
+  },
+  "msw": {
+    "workerDirectory": "public"
   }
 }

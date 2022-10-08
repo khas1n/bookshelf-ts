@@ -15,7 +15,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   onSubmit,
   submitButton,
 }) => {
-  const handleSubmit = (e: React.SyntheticEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const target = e.target as typeof e.target & {
       username: { value: string }
