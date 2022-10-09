@@ -7,8 +7,13 @@ import { Book } from '@/types/book'
 import { client } from '@/utils/api-client'
 import * as colors from '@/styles/colors'
 import { useAsync } from '@/utils/hooks'
+import { User } from '@/types/user'
 
-const DiscoverBooks: React.FC = () => {
+interface DiscoverBooksScreenProps {
+  user: User
+}
+
+const DiscoverBooksScreen: React.FC<DiscoverBooksScreenProps> = ({ user }) => {
   const { data, error, run, isLoading, isError, isSuccess } = useAsync<{
     books: Book[]
   }>()
@@ -17,8 +22,10 @@ const DiscoverBooks: React.FC = () => {
 
   React.useEffect(() => {
     if (!queried) return
-    run(client(`books?query=${encodeURIComponent(query)}`))
-  }, [query, queried])
+    run(
+      client(`books?query=${encodeURIComponent(query)}`, { token: user.token }),
+    )
+  }, [query, queried, user.token, run])
 
   function handleSearchSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -85,4 +92,4 @@ const DiscoverBooks: React.FC = () => {
   )
 }
 
-export { DiscoverBooks }
+export { DiscoverBooksScreen }

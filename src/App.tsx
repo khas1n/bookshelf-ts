@@ -3,8 +3,9 @@ import * as auth from '@/auth-provider'
 import * as colors from '@/styles/colors'
 import { LoginFormField, User } from '@/types/user'
 import { client } from '@/utils/api-client'
-import { UnauthenticatedApp } from '@/pages/UnauthenticatedApp'
-import { AuthenticatedApp } from '@/pages/AuthenticatedApp'
+import { BrowserRouter as Router } from 'react-router-dom'
+import { UnauthenticatedApp } from '@/UnauthenticatedApp'
+import { AuthenticatedApp } from '@/AuthenticatedApp'
 import { useAsync } from './utils/hooks'
 import { FullPageSpinner } from './components/lib'
 
@@ -71,7 +72,9 @@ const App = () => {
   }
   if (isSuccess) {
     return user ? (
-      <AuthenticatedApp user={user} logout={logout} />
+      <Router>
+        <AuthenticatedApp user={user} logout={logout} />
+      </Router>
     ) : (
       <UnauthenticatedApp login={login} register={register} />
     )

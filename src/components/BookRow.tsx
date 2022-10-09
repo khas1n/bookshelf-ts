@@ -1,6 +1,7 @@
 import * as mq from '@/styles/media-queries'
 import * as colors from '@/styles/colors'
 import { Book } from '@/types/book'
+import { Link } from 'react-router-dom'
 
 interface BookRowProps {
   book: Book
@@ -19,7 +20,8 @@ const BookRow: React.FC<BookRowProps> = ({ book }) => {
         position: 'relative',
       }}
     >
-      <div
+      <Link
+        to={`/book/${book.id}`}
         aria-labelledby={id}
         css={{
           minHeight: 270,
@@ -83,7 +85,7 @@ const BookRow: React.FC<BookRowProps> = ({ book }) => {
             {book.synopsis.substring(0, 500)}...
           </small>
         </div>
-      </div>
+      </Link>
     </div>
   )
 }
