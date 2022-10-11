@@ -8,7 +8,8 @@ import { UnauthenticatedApp } from '@/UnauthenticatedApp'
 import { AuthenticatedApp } from '@/AuthenticatedApp'
 import { useAsync } from './utils/hooks'
 import { FullPageSpinner } from './components/lib'
-
+import { QueryClient, QueryClientProvider } from 'react-query'
+const queryClient = new QueryClient()
 const getUser = async () => {
   let user = null
 
@@ -29,7 +30,6 @@ const App = () => {
     isIdle,
     isError,
     isSuccess,
-    run,
     setData,
   } = useAsync<User | null>()
 
@@ -72,9 +72,11 @@ const App = () => {
   }
   if (isSuccess) {
     return user ? (
-      <Router>
-        <AuthenticatedApp user={user} logout={logout} />
-      </Router>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <AuthenticatedApp user={user} logout={logout} />
+        </Router>
+      </QueryClientProvider>
     ) : (
       <UnauthenticatedApp login={login} register={register} />
     )

@@ -2,13 +2,28 @@ import * as mq from '@/styles/media-queries'
 import * as colors from '@/styles/colors'
 import { Book } from '@/types/book'
 import { Link } from 'react-router-dom'
+import { StatusButtons } from './StatusButton'
+import { User } from '@/types/user'
+import { List } from '@/types/list'
+import { client } from '@/utils/api-client'
+import { useQuery } from 'react-query'
+import { Rating } from './Rating'
 
 interface BookRowProps {
   book: Book
+  user: User
 }
-const BookRow: React.FC<BookRowProps> = ({ book }) => {
+const BookRow: React.FC<BookRowProps> = ({ book, user }) => {
   const { title, author, coverImageUrl } = book
-
+  const { data: listItems } = useQuery<List[]>({
+    queryKey: 'lists-items',
+    queryFn: () =>
+      client<{ listItems: List[] }>('list-items', { token: user.token }).then(
+        (data) => data.listItems,
+      ),
+  })
+  const listItem: List | null =
+    listItems?.find((li) => li.bookId === book.id) ?? null
   const id = `book-row-book-${book.id}`
 
   return (
@@ -67,6 +82,9 @@ const BookRow: React.FC<BookRowProps> = ({ book }) => {
               >
                 {title}
               </h2>
+              {listItem?.finishDate ? (
+                <Rating user={user} listItem={listItem} />
+              ) : null}
             </div>
             <div css={{ marginLeft: 10 }}>
               <div
@@ -86,6 +104,20 @@ const BookRow: React.FC<BookRowProps> = ({ book }) => {
           </small>
         </div>
       </Link>
+      <div
+        css={{
+          marginLeft: '20px',
+          position: 'absolute',
+          right: -20,
+          color: colors.gray80,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-around',
+          height: '100%',
+        }}
+      >
+        <StatusButtons user={user} book={book} />
+      </div>
     </div>
   )
 }

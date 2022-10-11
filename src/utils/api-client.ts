@@ -14,7 +14,7 @@ const client: ClientType = async (
 ) => {
   const config: RequestInit = {
     method: data ? 'POST' : 'GET',
-    ...(data && { data: JSON.stringify(data) }),
+    ...(data && { body: JSON.stringify(data) }),
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),
       ...(data && { 'Content-Type': 'application/json' }),

@@ -8,24 +8,25 @@ import { client } from '@/utils/api-client'
 import * as colors from '@/styles/colors'
 import { useAsync } from '@/utils/hooks'
 import { User } from '@/types/user'
+import { useQuery } from 'react-query'
 
 interface DiscoverBooksScreenProps {
   user: User
 }
 
 const DiscoverBooksScreen: React.FC<DiscoverBooksScreenProps> = ({ user }) => {
-  const { data, error, run, isLoading, isError, isSuccess } = useAsync<{
-    books: Book[]
-  }>()
   const [query, setQuery] = React.useState('')
   const [queried, setQueried] = React.useState(false)
-
-  React.useEffect(() => {
-    if (!queried) return
-    run(
+  const { data, error, isLoading, isError, isSuccess } = useQuery<
+    {
+      books: Book[]
+    },
+    Error
+  >({
+    queryKey: ['bookSearch', { query }],
+    queryFn: () =>
       client(`books?query=${encodeURIComponent(query)}`, { token: user.token }),
-    )
-  }, [query, queried, user.token, run])
+  })
 
   function handleSearchSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -80,7 +81,7 @@ const DiscoverBooksScreen: React.FC<DiscoverBooksScreenProps> = ({ user }) => {
           <BookListUL css={{ marginTop: 20 }}>
             {data.books.map((book) => (
               <li key={book.id} aria-label={book.title}>
-                <BookRow key={book.id} book={book} />
+                <BookRow key={book.id} book={book} user={user} />
               </li>
             ))}
           </BookListUL>

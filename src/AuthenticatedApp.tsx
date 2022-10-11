@@ -16,6 +16,8 @@ import { NotFoundScreen } from '@/screens/NotFound'
 
 import { User } from '@/types/user'
 import * as colors from '@/styles/colors'
+import { ReadingListScreen } from './screens/ReadingList'
+import { FinishedScreen } from './screens/FinishedScreen'
 
 interface AuthenticatedAppProps {
   user: User
@@ -134,10 +136,12 @@ const Nav: React.FC = () => {
         }}
       >
         <li>
-          {/*
-              🐨 Once the NavLink has been updated to use a Router Link,
-                change from the href prop to a "to" prop
-          */}
+          <NavLink to="/list">Reading List</NavLink>
+        </li>
+        <li>
+          <NavLink to="/finished">Finished Books</NavLink>
+        </li>
+        <li>
           <NavLink to="/discover">Discover</NavLink>
         </li>
       </ul>
@@ -148,6 +152,8 @@ const Nav: React.FC = () => {
 const AppRoutes: React.FC<AppRoutesProps> = ({ user }) => {
   return (
     <Routes>
+      <Route path="/list" element={<ReadingListScreen user={user} />} />
+      <Route path="/finished" element={<FinishedScreen user={user} />} />
       <Route path="/discover" element={<DiscoverBooksScreen user={user} />} />
       <Route path="/book/:bookId" element={<BookScreen user={user} />} />
       <Route path="*" element={<NotFoundScreen />} />
