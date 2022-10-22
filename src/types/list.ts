@@ -1,3 +1,5 @@
+import { Book } from './book'
+
 export interface List {
   id: string
   bookId: string
@@ -6,4 +8,5 @@ export interface List {
   notes: string
   startDate: number
   finishDate: number | null
+  book: Book
 }

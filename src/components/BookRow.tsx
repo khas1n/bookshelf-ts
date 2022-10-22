@@ -6,7 +6,7 @@ import { StatusButtons } from './StatusButton'
 import { User } from '@/types/user'
 import { List } from '@/types/list'
 import { client } from '@/utils/api-client'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 import { Rating } from './Rating'
 
 interface BookRowProps {
@@ -15,13 +15,11 @@ interface BookRowProps {
 }
 const BookRow: React.FC<BookRowProps> = ({ book, user }) => {
   const { title, author, coverImageUrl } = book
-  const { data: listItems } = useQuery<List[]>({
-    queryKey: 'lists-items',
-    queryFn: () =>
-      client<{ listItems: List[] }>('list-items', { token: user.token }).then(
-        (data) => data.listItems,
-      ),
-  })
+  const { data: listItems } = useQuery<List[]>(['lists-items'], () =>
+    client<{ listItems: List[] }>('list-items', { token: user.token }).then(
+      (data) => data.listItems,
+    ),
+  )
   const listItem: List | null =
     listItems?.find((li) => li.bookId === book.id) ?? null
   const id = `book-row-book-${book.id}`

@@ -7,16 +7,19 @@ import {
 } from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
 import React from 'react'
-// 🐨 you'll need useQuery, useMutation, and queryCache from 'react-query'
-// 🐨 you'll also need client from 'utils/api-client'
-import { useQuery, useMutation, useQueryClient } from 'react-query'
-import { client } from '@/utils/api-client'
+
 import { useAsync } from '@/utils/hooks'
 import * as colors from '@/styles/colors'
 import { CircleButton, Spinner } from './lib'
 import { Book } from '@/types/book'
 import { User } from '@/types/user'
 import { List } from '@/types/list'
+import {
+  useCreateListItem,
+  useListItem,
+  useRemoveListItem,
+  useUpdateListItem,
+} from '@/utils/list-items'
 
 interface TooltipButtonProps
   extends React.DetailedHTMLProps<
@@ -41,10 +44,14 @@ const TooltipButton: React.FC<TooltipButtonProps> = ({
   icon,
   ...rest
 }) => {
-  const { isLoading, isError, error, run } = useAsync<List>()
+  const { isLoading, isError, error, run, reset } = useAsync<List>()
 
   const handleClick = () => {
-    onClick && run(onClick())
+    if (error) {
+      reset()
+    } else {
+      onClick && run(onClick())
+    }
   }
 
   return (
@@ -72,52 +79,15 @@ const TooltipButton: React.FC<TooltipButtonProps> = ({
 }
 
 const StatusButtons: React.FC<StatusButtonsProps> = ({ user, book }) => {
-  const queryClient = useQueryClient()
-  const { data: listItems } = useQuery<List[]>({
-    queryKey: 'lists-items',
-    queryFn: () =>
-      client<{ listItems: List[] }>('list-items', { token: user.token }).then(
-        (data) => data.listItems,
-      ),
-  })
-  const listItem: List | null =
-    listItems?.find((li) => li.bookId === book.id) ?? null
+  const listItem = useListItem(book.id, user)
 
-  const { mutateAsync: update } = useMutation<List, Error, Partial<List>>(
-    (updatedData) =>
-      client(`list-items/${updatedData.id}`, {
-        method: 'PUT',
-        data: updatedData,
-        token: user.token,
-      }),
-    {
-      onSettled: () => {
-        queryClient.invalidateQueries('lists-items')
-      },
-    },
-  )
+  const { mutateAsync: update } = useUpdateListItem(user)
+  const { mutateAsync: remove } = useRemoveListItem(user)
+  const { mutateAsync: create } = useCreateListItem(user)
 
-  const { mutateAsync: remove } = useMutation<List, Error, { listId: string }>(
-    ({ listId }) =>
-      client(`list-items/${listId}`, { method: 'DELETE', token: user.token }),
-    {
-      onSettled: () => {
-        queryClient.invalidateQueries('lists-items')
-      },
-    },
-  )
-  const { mutateAsync: create } = useMutation<List, Error, { bookId: string }>(
-    ({ bookId }) =>
-      client(`list-items`, { data: { bookId }, token: user.token }),
-    {
-      onSettled: () => {
-        queryClient.invalidateQueries('lists-items')
-      },
-    },
-  )
   return (
     <React.Fragment>
-      {listItem ? (
+      {listItem.id !== undefined ? (
         listItem['finishDate'] ? (
           <TooltipButton
             label="Unmark as read"
@@ -134,7 +104,7 @@ const StatusButtons: React.FC<StatusButtonsProps> = ({ user, book }) => {
           />
         )
       ) : null}
-      {listItem ? (
+      {listItem.id !== undefined ? (
         <TooltipButton
           label="Remove from list"
           highlight={colors.danger}

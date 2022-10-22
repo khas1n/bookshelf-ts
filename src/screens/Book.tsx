@@ -1,36 +1,20 @@
 import React from 'react'
-// we need to get the "bookId" param from the router
-// 🐨 import the useParams hook from 'react-router-dom'
-import { client } from '@/utils/api-client'
 import Tooltip from '@reach/tooltip'
 import * as mq from '@/styles/media-queries'
 import * as colors from '@/styles/colors'
-import { useAsync } from '@/utils/hooks'
 import bookPlaceholderSvg from '@/assets/book-placeholder.svg'
 import { Book } from '@/types/book'
 import { User } from '@/types/user'
-import { useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 import { StatusButtons } from '@/components/StatusButton'
 import { List } from '@/types/list'
 import { FaRegCalendarAlt } from 'react-icons/fa'
 import { formatDate } from '@/utils/misc'
 import debounceFn from 'debounce-fn'
-import { Textarea } from '@/components/lib'
+import { ErrorMessage, Spinner, Textarea } from '@/components/lib'
 import { Rating } from '@/components/Rating'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
-
-const loadingBook: Omit<Book, 'id' | 'pageCount'> & {
-  loadingBook: boolean
-  id: undefined
-} = {
-  id: undefined,
-  title: 'Loading...',
-  author: 'loading...',
-  coverImageUrl: bookPlaceholderSvg,
-  publisher: 'Loading Publishing',
-  synopsis: 'Loading...',
-  loadingBook: true,
-}
+import { useBook } from '@/utils/books'
+import { useListItem, useUpdateListItem } from '@/utils/list-items'
 
 interface BookProps {
   user: User
@@ -38,26 +22,15 @@ interface BookProps {
 
 const BookScreen: React.FC<BookProps> = ({ user }) => {
   const { bookId } = useParams()
+  const book = useBook(bookId, user)
 
-  const { data: book = loadingBook } = useQuery<Book>({
-    queryKey: ['book', bookId],
-    queryFn: () =>
-      client<{ book: Book }>(`books/${bookId}`, { token: user.token }).then(
-        (data) => data.book,
-      ),
-  })
-  const { data: listItems } = useQuery<List[]>({
-    queryKey: 'lists-items',
-    queryFn: () =>
-      client<{ listItems: List[] }>('list-items', { token: user.token }).then(
-        (data) => data.listItems,
-      ),
-  })
-  const listItem: List | { id: undefined } = (listItems &&
-    listItems?.find((li) => li.bookId === book.id)) ?? { id: undefined }
+  const listItem = useListItem(bookId, user)
 
   const { title, author, coverImageUrl, publisher, synopsis } = book
 
+  if (!bookId) {
+    return <Navigate to="/discover" />
+  }
   return (
     <div>
       <div
@@ -103,7 +76,7 @@ const BookScreen: React.FC<BookProps> = ({ user }) => {
             </div>
           </div>
           <div css={{ marginTop: 10, height: 46 }}>
-            {listItem.id !== undefined && (
+            {listItem.id !== undefined && listItem.finishDate && (
               <Rating user={user} listItem={listItem} />
             )}
             {listItem.id !== undefined ? (
@@ -142,20 +115,12 @@ const NotesTextarea: React.FC<{ listItem: List; user: User }> = ({
   listItem,
   user,
 }) => {
-  const queryClient = useQueryClient()
-  const { mutateAsync: mutate } = useMutation<List, Error, Partial<List>>(
-    (updatedData) =>
-      client(`list-items/${updatedData.id}`, {
-        method: 'PUT',
-        data: updatedData,
-        token: user.token,
-      }),
-    {
-      onSettled: () => {
-        queryClient.invalidateQueries('lists-items')
-      },
-    },
-  )
+  const {
+    mutateAsync: mutate,
+    isError,
+    error,
+    isLoading,
+  } = useUpdateListItem(user)
   const debouncedMutate = React.useMemo(
     () => debounceFn(mutate, { wait: 300 }),
     [mutate],
@@ -182,6 +147,14 @@ const NotesTextarea: React.FC<{ listItem: List; user: User }> = ({
         >
           Notes
         </label>
+        {isError ? (
+          <ErrorMessage
+            error={error}
+            variant="inline"
+            css={{ marginLeft: 6, fontSize: '0.7em' }}
+          />
+        ) : null}
+        {isLoading && <Spinner />}
       </div>
       <Textarea
         id="notes"

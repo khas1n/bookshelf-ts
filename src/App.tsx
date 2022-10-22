@@ -8,8 +8,10 @@ import { UnauthenticatedApp } from '@/UnauthenticatedApp'
 import { AuthenticatedApp } from '@/AuthenticatedApp'
 import { useAsync } from './utils/hooks'
 import { FullPageSpinner } from './components/lib'
-import { QueryClient, QueryClientProvider } from 'react-query'
-const queryClient = new QueryClient()
+import { QueryClientProvider } from '@tanstack/react-query'
+import { queryCache, queryClient } from './queryClient'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
 const getUser = async () => {
   let user = null
 
@@ -47,6 +49,7 @@ const App = () => {
     })
   const logout = () => {
     auth.logout()
+    queryCache.clear()
     setData(null)
   }
 
@@ -76,6 +79,7 @@ const App = () => {
         <Router>
           <AuthenticatedApp user={user} logout={logout} />
         </Router>
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     ) : (
       <UnauthenticatedApp login={login} register={register} />

@@ -1,9 +1,10 @@
-// 🐨 you'll need useQuery from 'react-query'
+// 🐨 you'll need useQuery from '@tanstack/react-query'
 // 🐨 and client from 'utils/api-client'
 import { BookListUL } from './lib'
 import { BookRow } from './BookRow'
 import { List } from '@/types/list'
 import { User } from '@/types/user'
+import { useListItems } from '@/utils/list-items'
 
 interface ListItemListProps {
   user: User
@@ -18,14 +19,9 @@ const ListItemList: React.FC<ListItemListProps> = ({
   noListItems,
   noFilteredListItems,
 }) => {
-  // 🐨 call useQuery to get the list-items from the 'list-items' endpoint
-  // queryKey should be 'list-items'
-  // queryFn should call the 'list-items' endpoint
+  const listItems = useListItems(user)
 
-  // 🐨 assign this to the list items you get back from react-query
-  const listItems: List[] = []
-
-  const filteredListItems = listItems?.filter(filterListItems)
+  const filteredListItems = listItems ? listItems?.filter(filterListItems) : []
 
   if (!listItems?.length) {
     return (

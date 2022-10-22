@@ -1,4 +1,5 @@
 import * as auth from '@/auth-provider'
+import { queryCache } from '@/queryClient'
 interface CustomConfig extends RequestInit {
   token?: string
   data?: object
@@ -23,22 +24,23 @@ const client: ClientType = async (
     ...customConfig,
   }
 
-  const response = await window.fetch(
-    `${import.meta.env.VITE_API_URL}/${endpoint}`,
-    config,
-  )
-  if (response.status === 401) {
-    await auth.logout()
-    // refresh the page for them
-    window.location.assign(window.location.toString())
-    return Promise.reject({ message: 'Please re-authenticate.' })
-  }
-  const responseData = await response.json()
-  if (response.ok) {
-    return responseData
-  } else {
-    return Promise.reject(data)
-  }
+  return window
+    .fetch(`${import.meta.env.VITE_API_URL}/${endpoint}`, config)
+    .then(async (response) => {
+      if (response.status === 401) {
+        queryCache.clear()
+        await auth.logout()
+        // refresh the page for them
+        window.location.assign(window.location.toString())
+        return Promise.reject({ message: 'Please re-authenticate.' })
+      }
+      const data = await response.json()
+      if (response.ok) {
+        return data
+      } else {
+        return Promise.reject(data)
+      }
+    })
 }
 
 export { client }

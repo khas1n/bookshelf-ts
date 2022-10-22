@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Button } from '@/components/lib'
+import { Button, ErrorMessage, FullPageErrorFallback } from '@/components/lib'
 import * as mq from '@/styles/media-queries'
 import {
   Routes,
@@ -9,6 +9,7 @@ import {
   useMatch,
   useResolvedPath,
 } from 'react-router-dom'
+import { ErrorBoundary } from 'react-error-boundary'
 
 import { DiscoverBooksScreen } from '@/screens/DiscoverBooks'
 import { BookScreen } from '@/screens/Book'
@@ -28,12 +29,27 @@ interface AppRoutesProps {
   user: User
 }
 
+const ErrorFallback = ({ error }: { error: Error }) => {
+  return (
+    <ErrorMessage
+      error={error}
+      css={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    />
+  )
+}
+
 const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
   user,
   logout,
 }) => {
   return (
-    <React.Fragment>
+    <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
       <div
         css={{
           display: 'flex',
@@ -72,10 +88,12 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
           <Nav />
         </div>
         <main css={{ width: '100%' }}>
-          <AppRoutes user={user} />
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <AppRoutes user={user} />
+          </ErrorBoundary>
         </main>
       </div>
-    </React.Fragment>
+    </ErrorBoundary>
   )
 }
 const NavLink: React.FC<LinkProps> = (props) => {

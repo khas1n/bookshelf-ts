@@ -3,12 +3,9 @@ import Tooltip from '@reach/tooltip'
 import { FaSearch, FaTimes } from 'react-icons/fa'
 import { Input, BookListUL, Spinner } from '@/components/lib'
 import { BookRow } from '@/components/BookRow'
-import { Book } from '@/types/book'
-import { client } from '@/utils/api-client'
 import * as colors from '@/styles/colors'
-import { useAsync } from '@/utils/hooks'
 import { User } from '@/types/user'
-import { useQuery } from 'react-query'
+import { refetchBookSearchQuery, useBooksSearch } from '@/utils/books'
 
 interface DiscoverBooksScreenProps {
   user: User
@@ -16,17 +13,12 @@ interface DiscoverBooksScreenProps {
 
 const DiscoverBooksScreen: React.FC<DiscoverBooksScreenProps> = ({ user }) => {
   const [query, setQuery] = React.useState('')
-  const [queried, setQueried] = React.useState(false)
-  const { data, error, isLoading, isError, isSuccess } = useQuery<
-    {
-      books: Book[]
-    },
-    Error
-  >({
-    queryKey: ['bookSearch', { query }],
-    queryFn: () =>
-      client(`books?query=${encodeURIComponent(query)}`, { token: user.token }),
-  })
+  const [, setQueried] = React.useState(false)
+  const { books, error, isLoading, isError } = useBooksSearch(query, user)
+
+  React.useEffect(() => {
+    return () => refetchBookSearchQuery(user)
+  }, [user])
 
   function handleSearchSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -76,19 +68,17 @@ const DiscoverBooksScreen: React.FC<DiscoverBooksScreenProps> = ({ user }) => {
           <pre>{error.message}</pre>
         </div>
       ) : null}
-      {isSuccess ? (
-        data?.books?.length ? (
-          <BookListUL css={{ marginTop: 20 }}>
-            {data.books.map((book) => (
-              <li key={book.id} aria-label={book.title}>
-                <BookRow key={book.id} book={book} user={user} />
-              </li>
-            ))}
-          </BookListUL>
-        ) : (
-          <p>No books found. Try another search.</p>
-        )
-      ) : null}
+      {books?.length ? (
+        <BookListUL css={{ marginTop: 20 }}>
+          {books.map((book) => (
+            <li key={book.id} aria-label={book.title}>
+              <BookRow key={book.id} book={book} user={user} />
+            </li>
+          ))}
+        </BookListUL>
+      ) : (
+        <p>No books found. Try another search.</p>
+      )}
     </div>
   )
 }

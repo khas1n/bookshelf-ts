@@ -7,8 +7,8 @@ import React from 'react'
 import { FaStar } from 'react-icons/fa'
 import * as colors from '@/styles/colors'
 import { CSSObject } from '@emotion/react'
-import { client } from '@/utils/api-client'
-import { useMutation, useQueryClient } from 'react-query'
+import { useUpdateListItem } from '@/utils/list-items'
+import { ErrorMessage } from './lib'
 
 const visuallyHiddenCSS: CSSObject = {
   border: '0',
@@ -27,20 +27,7 @@ interface RatingProps {
 
 const Rating: React.FC<RatingProps> = ({ listItem, user }) => {
   const [isTabbing, setIsTabbing] = React.useState(false)
-  const queryClient = useQueryClient()
-  const { mutateAsync: update } = useMutation<List, Error, Partial<List>>(
-    (updatedData) =>
-      client(`list-items/${updatedData.id}`, {
-        method: 'PUT',
-        data: updatedData,
-        token: user.token,
-      }),
-    {
-      onSettled: () => {
-        queryClient.invalidateQueries('lists-items')
-      },
-    },
-  )
+  const { mutateAsync: update, isError, error } = useUpdateListItem(user)
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -120,6 +107,13 @@ const Rating: React.FC<RatingProps> = ({ listItem, user }) => {
       }}
     >
       <span css={{ display: 'flex' }}>{stars}</span>
+      {isError ? (
+        <ErrorMessage
+          error={error}
+          variant="inline"
+          css={{ marginLeft: 6, fontSize: '0.7em' }}
+        />
+      ) : null}
     </div>
   )
 }

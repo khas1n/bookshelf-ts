@@ -115,7 +115,7 @@ const errorMessageVariants = {
   inline: { display: 'inline-block' },
 }
 
-interface ErrorMessageProps {
+interface ErrorMessageProps extends React.HTMLAttributes<HTMLDivElement> {
   error: Error
   variant?: keyof typeof errorMessageVariants
 }
@@ -143,7 +143,8 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
     </div>
   )
 }
-interface FullPageErrorFallbackProps {
+interface FullPageErrorFallbackProps
+  extends React.HTMLAttributes<HTMLDivElement> {
   error: Error
 }
 const FullPageErrorFallback: React.FC<FullPageErrorFallbackProps> = ({
