@@ -13,6 +13,7 @@ import { ErrorMessage, Spinner, Textarea } from '@/components/lib'
 import { Rating } from '@/components/Rating'
 import { useBook } from '@/utils/books'
 import { useListItem, useUpdateListItem } from '@/utils/list-items'
+import { Profiler } from '@/components/Profiler'
 
 const BookScreen: React.FC = () => {
   const { bookId } = useParams()
@@ -26,63 +27,65 @@ const BookScreen: React.FC = () => {
     return <Navigate to="/discover" />
   }
   return (
-    <div>
-      <div
-        css={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 2fr',
-          gridGap: '2em',
-          marginBottom: '1em',
-          [mq.small]: {
-            display: 'flex',
-            flexDirection: 'column',
-          },
-        }}
-      >
-        <img
-          src={coverImageUrl}
-          alt={`${title} book cover`}
-          css={{ width: '100%', maxWidth: '14rem' }}
-        />
-        <div>
-          <div css={{ display: 'flex', position: 'relative' }}>
-            <div css={{ flex: 1, justifyContent: 'space-between' }}>
-              <h1>{title}</h1>
-              <div>
-                <i>{author}</i>
-                <span css={{ marginRight: 6, marginLeft: 6 }}>|</span>
-                <i>{publisher}</i>
+    <Profiler id="Book Screen" metadata={{ bookId, listItemId: listItem?.id }}>
+      <div>
+        <div
+          css={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 2fr',
+            gridGap: '2em',
+            marginBottom: '1em',
+            [mq.small]: {
+              display: 'flex',
+              flexDirection: 'column',
+            },
+          }}
+        >
+          <img
+            src={coverImageUrl}
+            alt={`${title} book cover`}
+            css={{ width: '100%', maxWidth: '14rem' }}
+          />
+          <div>
+            <div css={{ display: 'flex', position: 'relative' }}>
+              <div css={{ flex: 1, justifyContent: 'space-between' }}>
+                <h1>{title}</h1>
+                <div>
+                  <i>{author}</i>
+                  <span css={{ marginRight: 6, marginLeft: 6 }}>|</span>
+                  <i>{publisher}</i>
+                </div>
+              </div>
+              <div
+                css={{
+                  right: 0,
+                  color: colors.gray80,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-around',
+                  minHeight: 100,
+                }}
+              >
+                {book.id !== undefined && <StatusButtons book={book} />}
               </div>
             </div>
-            <div
-              css={{
-                right: 0,
-                color: colors.gray80,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-around',
-                minHeight: 100,
-              }}
-            >
-              {book.id !== undefined && <StatusButtons book={book} />}
+            <div css={{ marginTop: 10, height: 46 }}>
+              {listItem.id !== undefined && listItem.finishDate && (
+                <Rating listItem={listItem} />
+              )}
+              {listItem.id !== undefined ? (
+                <ListItemTimeframe listItem={listItem} />
+              ) : null}
             </div>
+            <br />
+            <p>{synopsis}</p>
           </div>
-          <div css={{ marginTop: 10, height: 46 }}>
-            {listItem.id !== undefined && listItem.finishDate && (
-              <Rating listItem={listItem} />
-            )}
-            {listItem.id !== undefined ? (
-              <ListItemTimeframe listItem={listItem} />
-            ) : null}
-          </div>
-          <br />
-          <p>{synopsis}</p>
         </div>
+        {book.id !== undefined && listItem.id !== undefined ? (
+          <NotesTextarea listItem={listItem} />
+        ) : null}
       </div>
-      {book.id !== undefined && listItem.id !== undefined ? (
-        <NotesTextarea listItem={listItem} />
-      ) : null}
-    </div>
+    </Profiler>
   )
 }
 const ListItemTimeframe: React.FC<{ listItem: List }> = ({ listItem }) => {

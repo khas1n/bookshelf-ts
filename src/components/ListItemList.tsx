@@ -3,23 +3,21 @@
 import { BookListUL } from './lib'
 import { BookRow } from './BookRow'
 import { List } from '@/types/list'
-import { User } from '@/types/user'
 import { useListItems } from '@/utils/list-items'
+import { Profiler } from './Profiler'
 
 interface ListItemListProps {
-  user: User
   filterListItems: (listItem: List) => boolean
   noListItems: React.ReactNode
   noFilteredListItems: React.ReactNode
 }
 
 const ListItemList: React.FC<ListItemListProps> = ({
-  user,
   filterListItems,
   noListItems,
   noFilteredListItems,
 }) => {
-  const listItems = useListItems(user)
+  const listItems = useListItems()
 
   const filteredListItems = listItems ? listItems?.filter(filterListItems) : []
 
@@ -37,13 +35,18 @@ const ListItemList: React.FC<ListItemListProps> = ({
   }
 
   return (
-    <BookListUL>
-      {filteredListItems.map((listItem) => (
-        <li key={listItem.id}>
-          <BookRow user={user} book={listItem.book} />
-        </li>
-      ))}
-    </BookListUL>
+    <Profiler
+      id="List Item List"
+      metadata={{ listItemCount: filteredListItems.length }}
+    >
+      <BookListUL>
+        {filteredListItems.map((listItem) => (
+          <li key={listItem.id}>
+            <BookRow book={listItem.book} />
+          </li>
+        ))}
+      </BookListUL>
+    </Profiler>
   )
 }
 

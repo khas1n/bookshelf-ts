@@ -5,6 +5,7 @@ import { Input, BookListUL, Spinner } from '@/components/lib'
 import { BookRow } from '@/components/BookRow'
 import * as colors from '@/styles/colors'
 import { useRefetchBookSearchQuery, useBooksSearch } from '@/utils/books'
+import { Profiler } from '@/components/Profiler'
 
 const DiscoverBooksScreen: React.FC = () => {
   const [query, setQuery] = React.useState('')
@@ -67,13 +68,18 @@ const DiscoverBooksScreen: React.FC = () => {
         </div>
       ) : null}
       {books?.length ? (
-        <BookListUL css={{ marginTop: 20 }}>
-          {books.map((book) => (
-            <li key={book.id} aria-label={book.title}>
-              <BookRow key={book.id} book={book} />
-            </li>
-          ))}
-        </BookListUL>
+        <Profiler
+          id="Discover Books Screen Book List"
+          metadata={{ query, bookCount: books.length }}
+        >
+          <BookListUL css={{ marginTop: 20 }}>
+            {books.map((book) => (
+              <li key={book.id} aria-label={book.title}>
+                <BookRow key={book.id} book={book} />
+              </li>
+            ))}
+          </BookListUL>
+        </Profiler>
       ) : (
         <p>No books found. Try another search.</p>
       )}

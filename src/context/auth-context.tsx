@@ -50,19 +50,34 @@ const AuthProvider: React.FC<React.HTMLAttributes<HTMLDivElement>> = (
     getUser().then((user) => setData(user))
   }, [])
 
-  const login = (formData: LoginFormField): Promise<void> =>
-    auth.login(formData).then((user) => {
-      setData(user)
-    })
-  const register = (formData: LoginFormField): Promise<void> =>
-    auth.register(formData).then((user) => {
-      setData(user)
-    })
-  const logout = () => {
+  const login = React.useCallback(
+    (formData: LoginFormField): Promise<void> =>
+      auth.login(formData).then((user) => {
+        setData(user)
+      }),
+    [setData],
+  )
+  const register = React.useCallback(
+    (formData: LoginFormField): Promise<void> =>
+      auth.register(formData).then((user) => {
+        setData(user)
+      }),
+    [setData],
+  )
+  const logout = React.useCallback(() => {
     auth.logout()
     queryCache.clear()
     setData(null)
-  }
+  }, [setData])
+  const contextValue = React.useMemo(
+    () => ({
+      user,
+      login,
+      register,
+      logout,
+    }),
+    [user, login, register, logout],
+  )
 
   if (isLoading || isIdle) {
     return <FullPageSpinner />
@@ -71,7 +86,6 @@ const AuthProvider: React.FC<React.HTMLAttributes<HTMLDivElement>> = (
     return <FullPageErrorFallback error={error ?? new Error()} />
   }
   if (isSuccess) {
-    const contextValue = { user, login, register, logout }
     return <AuthContext.Provider value={contextValue} {...props} />
   }
   throw new Error(`Unhandled status: ${status}`)

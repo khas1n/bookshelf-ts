@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import macrosPlugin from 'vite-plugin-babel-macros'
 import path from 'path'
+import nodePolyfills from 'rollup-plugin-node-polyfills'
 
 const redirectServer = {
   name: 'redirect-server',
@@ -23,6 +24,25 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    target: 'esnext',
+    // rollupOptions: {
+    //   external: [
+    //     'react',
+    //     'react-dom/client',
+    //     'react-dom',
+    //     'timers',
+    //     'prop-types',
+    //     'use-sync-external-store/shim/index.js',
+    //     'is-node-process',
+    //     'js-levenshtein',
+    //     '@mswjs/interceptors/lib/interceptors/XMLHttpRequest',
+    //   ],
+    // },
+    // commonjsOptions: {
+    //   include: /node_modules/,
+    // },
+  },
   plugins: [
     redirectServer,
     react({
@@ -31,6 +51,7 @@ export default defineConfig({
         plugins: ['@emotion/babel-plugin'],
       },
     }),
+    nodePolyfills(),
     macrosPlugin(),
   ],
 })

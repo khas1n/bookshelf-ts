@@ -52,4 +52,4 @@ const UnauthenticatedApp: React.FC = () => {
   )
 }
 
-export { UnauthenticatedApp }
+export default UnauthenticatedApp

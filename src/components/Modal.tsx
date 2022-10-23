@@ -25,7 +25,8 @@ const Modal: React.FC<PropsWithChildren> = (props) => {
 
 const useModal = () => {
   const ctx = React.useContext(ModalContext)
-  if (ctx === null) throw new Error()
+  if (ctx === null)
+    throw new Error('useModal must be used within a ModalContext.Provider')
   return ctx
 }
 

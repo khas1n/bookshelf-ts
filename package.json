@@ -2,7 +2,6 @@
   "name": "bookself-ts",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "homepage": "http://localhost:5173/",
   "scripts": {
     "dev": "vite",
@@ -26,15 +25,18 @@
     "react-dom": "^18.2.0",
     "react-error-boundary": "^3.1.4",
     "react-icons": "^4.4.0",
-    "react-router-dom": "^6.4.2"
+    "react-router-dom": "^6.4.2",
+    "use-sync-external-store": "^1.2.0"
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.10.2",
+    "@rollup/plugin-commonjs": "^23.0.2",
     "@types/node": "^18.8.3",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@typescript-eslint/eslint-plugin": "^5.39.0",
     "@typescript-eslint/parser": "^5.39.0",
+    "@vitejs/plugin-legacy": "^2.2.0",
     "@vitejs/plugin-react": "^2.1.0",
     "eslint": "^8.25.0",
     "eslint-config-prettier": "^8.5.0",
@@ -42,10 +44,13 @@
     "match-sorter": "^6.3.1",
     "node-match-path": "^0.6.3",
     "prettier": "^2.7.1",
+    "rollup-plugin-node-polyfills": "^0.2.1",
     "sass": "^1.55.0",
+    "terser": "^5.15.1",
     "typescript": "^4.6.4",
     "vite": "^3.1.0",
-    "vite-plugin-babel-macros": "^1.0.6"
+    "vite-plugin-babel-macros": "^1.0.6",
+    "vite-plugin-external": "^1.2.5"
   },
   "msw": {
     "workerDirectory": "public"

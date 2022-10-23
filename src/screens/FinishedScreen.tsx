@@ -1,13 +1,10 @@
 import React from 'react'
 import { Link } from '@/components/lib'
 import { ListItemList } from '@/components/ListItemList'
-import { useAuth } from '@/context/auth-context'
 
 const FinishedScreen: React.FC = () => {
-  const { user } = useAuth()
   return (
     <ListItemList
-      user={user}
       filterListItems={(li) => Boolean(li.finishDate)}
       noListItems={
         <p>
