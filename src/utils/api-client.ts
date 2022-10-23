@@ -4,7 +4,7 @@ interface CustomConfig extends RequestInit {
   token?: string
   data?: object
 }
-type ClientType = <T>(
+export type ClientType = <T>(
   endpoint: string,
   customConfig?: CustomConfig,
 ) => Promise<T>

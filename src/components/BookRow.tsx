@@ -3,17 +3,17 @@ import * as colors from '@/styles/colors'
 import { Book } from '@/types/book'
 import { Link } from 'react-router-dom'
 import { StatusButtons } from './StatusButton'
-import { User } from '@/types/user'
 import { List } from '@/types/list'
 import { client } from '@/utils/api-client'
 import { useQuery } from '@tanstack/react-query'
 import { Rating } from './Rating'
+import { useAuth } from '@/context/auth-context'
 
 interface BookRowProps {
   book: Book
-  user: User
 }
-const BookRow: React.FC<BookRowProps> = ({ book, user }) => {
+const BookRow: React.FC<BookRowProps> = ({ book }) => {
+  const { user } = useAuth()
   const { title, author, coverImageUrl } = book
   const { data: listItems } = useQuery<List[]>(['lists-items'], () =>
     client<{ listItems: List[] }>('list-items', { token: user.token }).then(
@@ -80,9 +80,7 @@ const BookRow: React.FC<BookRowProps> = ({ book, user }) => {
               >
                 {title}
               </h2>
-              {listItem?.finishDate ? (
-                <Rating user={user} listItem={listItem} />
-              ) : null}
+              {listItem?.finishDate ? <Rating listItem={listItem} /> : null}
             </div>
             <div css={{ marginLeft: 10 }}>
               <div
@@ -114,7 +112,7 @@ const BookRow: React.FC<BookRowProps> = ({ book, user }) => {
           height: '100%',
         }}
       >
-        <StatusButtons user={user} book={book} />
+        <StatusButtons book={book} />
       </div>
     </div>
   )

@@ -1,12 +1,10 @@
 import * as React from 'react'
 import { Link } from '@/components/lib'
 import { ListItemList } from '@/components/ListItemList'
-import { User } from '@/types/user'
+import { useAuth } from '@/context/auth-context'
 
-interface ReadingListScreenProps {
-  user: User
-}
-const ReadingListScreen: React.FC<ReadingListScreenProps> = ({ user }) => {
+const ReadingListScreen: React.FC = () => {
+  const { user } = useAuth()
   return (
     <ListItemList
       user={user}

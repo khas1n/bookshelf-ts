@@ -2,8 +2,6 @@ import React from 'react'
 import Tooltip from '@reach/tooltip'
 import * as mq from '@/styles/media-queries'
 import * as colors from '@/styles/colors'
-import bookPlaceholderSvg from '@/assets/book-placeholder.svg'
-import { Book } from '@/types/book'
 import { User } from '@/types/user'
 import { Navigate, useParams } from 'react-router-dom'
 import { StatusButtons } from '@/components/StatusButton'
@@ -16,15 +14,11 @@ import { Rating } from '@/components/Rating'
 import { useBook } from '@/utils/books'
 import { useListItem, useUpdateListItem } from '@/utils/list-items'
 
-interface BookProps {
-  user: User
-}
-
-const BookScreen: React.FC<BookProps> = ({ user }) => {
+const BookScreen: React.FC = () => {
   const { bookId } = useParams()
-  const book = useBook(bookId, user)
+  const book = useBook(bookId)
 
-  const listItem = useListItem(bookId, user)
+  const listItem = useListItem(bookId)
 
   const { title, author, coverImageUrl, publisher, synopsis } = book
 
@@ -70,14 +64,12 @@ const BookScreen: React.FC<BookProps> = ({ user }) => {
                 minHeight: 100,
               }}
             >
-              {book.id !== undefined && (
-                <StatusButtons user={user} book={book} />
-              )}
+              {book.id !== undefined && <StatusButtons book={book} />}
             </div>
           </div>
           <div css={{ marginTop: 10, height: 46 }}>
             {listItem.id !== undefined && listItem.finishDate && (
-              <Rating user={user} listItem={listItem} />
+              <Rating listItem={listItem} />
             )}
             {listItem.id !== undefined ? (
               <ListItemTimeframe listItem={listItem} />
@@ -88,7 +80,7 @@ const BookScreen: React.FC<BookProps> = ({ user }) => {
         </div>
       </div>
       {book.id !== undefined && listItem.id !== undefined ? (
-        <NotesTextarea user={user} listItem={listItem} />
+        <NotesTextarea listItem={listItem} />
       ) : null}
     </div>
   )
@@ -111,16 +103,8 @@ const ListItemTimeframe: React.FC<{ listItem: List }> = ({ listItem }) => {
   )
 }
 
-const NotesTextarea: React.FC<{ listItem: List; user: User }> = ({
-  listItem,
-  user,
-}) => {
-  const {
-    mutateAsync: mutate,
-    isError,
-    error,
-    isLoading,
-  } = useUpdateListItem(user)
+const NotesTextarea: React.FC<{ listItem: List }> = ({ listItem }) => {
+  const { mutateAsync: mutate, isError, error, isLoading } = useUpdateListItem()
   const debouncedMutate = React.useMemo(
     () => debounceFn(mutate, { wait: 300 }),
     [mutate],

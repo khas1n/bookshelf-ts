@@ -163,7 +163,7 @@ const FullPageErrorFallback: React.FC<FullPageErrorFallbackProps> = ({
       }}
     >
       <p>Uh oh... There's a problem. Try refreshing the app.</p>
-      <pre>{error.message}</pre>
+      {error && <pre>{error.message}</pre>}
     </div>
   )
 }

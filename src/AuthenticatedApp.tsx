@@ -15,19 +15,10 @@ import { DiscoverBooksScreen } from '@/screens/DiscoverBooks'
 import { BookScreen } from '@/screens/Book'
 import { NotFoundScreen } from '@/screens/NotFound'
 
-import { User } from '@/types/user'
 import * as colors from '@/styles/colors'
 import { ReadingListScreen } from './screens/ReadingList'
 import { FinishedScreen } from './screens/FinishedScreen'
-
-interface AuthenticatedAppProps {
-  user: User
-  logout: () => void
-}
-
-interface AppRoutesProps {
-  user: User
-}
+import { useAuth } from './context/auth-context'
 
 const ErrorFallback = ({ error }: { error: Error }) => {
   return (
@@ -44,10 +35,12 @@ const ErrorFallback = ({ error }: { error: Error }) => {
   )
 }
 
-const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
-  user,
-  logout,
-}) => {
+const AuthenticatedApp: React.FC = () => {
+  const { user, logout } = useAuth()
+  if (!user) {
+    logout()
+    return null
+  }
   return (
     <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
       <div
@@ -89,7 +82,7 @@ const AuthenticatedApp: React.FC<AuthenticatedAppProps> = ({
         </div>
         <main css={{ width: '100%' }}>
           <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <AppRoutes user={user} />
+            <AppRoutes />
           </ErrorBoundary>
         </main>
       </div>
@@ -167,13 +160,13 @@ const Nav: React.FC = () => {
   )
 }
 
-const AppRoutes: React.FC<AppRoutesProps> = ({ user }) => {
+const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route path="/list" element={<ReadingListScreen user={user} />} />
-      <Route path="/finished" element={<FinishedScreen user={user} />} />
-      <Route path="/discover" element={<DiscoverBooksScreen user={user} />} />
-      <Route path="/book/:bookId" element={<BookScreen user={user} />} />
+      <Route path="/list" element={<ReadingListScreen />} />
+      <Route path="/finished" element={<FinishedScreen />} />
+      <Route path="/discover" element={<DiscoverBooksScreen />} />
+      <Route path="/book/:bookId" element={<BookScreen />} />
       <Route path="*" element={<NotFoundScreen />} />
     </Routes>
   )

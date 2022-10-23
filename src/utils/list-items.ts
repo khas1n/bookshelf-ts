@@ -1,17 +1,14 @@
-import { User } from '@/types/user'
 import { List } from '@/types/list'
 import { setQueryDataForBook } from './books'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { client } from './api-client'
 import { queryClient } from '@/queryClient'
+import { useAuth, useClient } from '@/context/auth-context'
 
-const useListItems = (user: User) => {
+const useListItems = () => {
+  const client = useClient<{ listItems: List[] }>()
   const { data: listItems } = useQuery<List[]>(
     ['lists-items'],
-    () =>
-      client<{ listItems: List[] }>('list-items', { token: user.token }).then(
-        (data) => data.listItems,
-      ),
+    () => client('list-items').then((data) => data.listItems),
     {
       onSuccess(listItems) {
         listItems.forEach((listItem) => {
@@ -23,8 +20,8 @@ const useListItems = (user: User) => {
   return listItems ?? []
 }
 
-const useListItem = (bookId: string | undefined, user: User) => {
-  const listItems = useListItems(user)
+const useListItem = (bookId: string | undefined) => {
+  const listItems = useListItems()
   return (
     (listItems && listItems?.find((li) => li.bookId === bookId)) ?? {
       id: undefined,
@@ -45,16 +42,13 @@ const defaultMutationOptions: OptionsUseMutationParameter = {
   },
 }
 
-const useUpdateListItem = (
-  user: User,
-  option?: OptionsUseMutationParameter,
-) => {
+const useUpdateListItem = (option?: OptionsUseMutationParameter) => {
+  const client = useClient<List>()
   return useMutation<List, Error, Partial<List>>(
     (updatedData) =>
       client(`list-items/${updatedData.id}`, {
         method: 'PUT',
         data: updatedData,
-        token: user.token,
       }),
     {
       onMutate: async (newItem) => {
@@ -79,13 +73,10 @@ const useUpdateListItem = (
   )
 }
 
-const useRemoveListItem = (
-  user: User,
-  option?: OptionsUseMutationParameter,
-) => {
+const useRemoveListItem = (option?: OptionsUseMutationParameter) => {
+  const client = useClient<List>()
   return useMutation<List, Error, { listId: string }>(
-    ({ listId }) =>
-      client(`list-itemss/${listId}`, { method: 'DELETE', token: user.token }),
+    ({ listId }) => client(`list-items/${listId}`, { method: 'DELETE' }),
     {
       onMutate: async ({ listId }) => {
         await queryClient.cancelQueries(['lists-items'])
@@ -102,13 +93,10 @@ const useRemoveListItem = (
   )
 }
 
-const useCreateListItem = (
-  user: User,
-  option?: OptionsUseMutationParameter,
-) => {
+const useCreateListItem = (option?: OptionsUseMutationParameter) => {
+  const client = useClient<List>()
   return useMutation<List, Error, { bookId: string }>(
-    ({ bookId }) =>
-      client(`list-items`, { data: { bookId }, token: user.token }),
+    ({ bookId }) => client(`list-items`, { data: { bookId } }),
     { ...defaultMutationOptions, ...option },
   )
 }

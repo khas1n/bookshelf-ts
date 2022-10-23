@@ -3,26 +3,10 @@ import React from 'react'
 import LoginForm from '@/components/LoginForm'
 import { Button } from '@/components/lib'
 import { Modal, ModalContents, ModalOpenButton } from '@/components/Modal'
-import { LoginFormField, User } from '@/types/user'
+import { useAuth } from './context/auth-context'
 
-enum DialogState {
-  'none',
-  'login',
-  'register',
-}
-
-interface UnauthenticatedAppProps {
-  login: (formData: LoginFormField) => Promise<void>
-  register: (formData: LoginFormField) => Promise<void>
-}
-
-const UnauthenticatedApp: React.FC<UnauthenticatedAppProps> = ({
-  login,
-  register,
-}) => {
-  const [openModal, setOpenModal] = React.useState<DialogState>(
-    DialogState.none,
-  )
+const UnauthenticatedApp: React.FC = () => {
+  const { login, register } = useAuth()
 
   return (
     <div

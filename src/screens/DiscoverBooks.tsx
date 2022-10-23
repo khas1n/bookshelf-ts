@@ -1,24 +1,22 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Tooltip from '@reach/tooltip'
 import { FaSearch, FaTimes } from 'react-icons/fa'
 import { Input, BookListUL, Spinner } from '@/components/lib'
 import { BookRow } from '@/components/BookRow'
 import * as colors from '@/styles/colors'
-import { User } from '@/types/user'
-import { refetchBookSearchQuery, useBooksSearch } from '@/utils/books'
+import { useRefetchBookSearchQuery, useBooksSearch } from '@/utils/books'
 
-interface DiscoverBooksScreenProps {
-  user: User
-}
-
-const DiscoverBooksScreen: React.FC<DiscoverBooksScreenProps> = ({ user }) => {
+const DiscoverBooksScreen: React.FC = () => {
   const [query, setQuery] = React.useState('')
   const [, setQueried] = React.useState(false)
-  const { books, error, isLoading, isError } = useBooksSearch(query, user)
+  const { books, error, isLoading, isError } = useBooksSearch(query)
+  const refetchBookSearchQuery = useRefetchBookSearchQuery()
 
-  React.useEffect(() => {
-    return () => refetchBookSearchQuery(user)
-  }, [user])
+  useEffect(() => {
+    return () => {
+      refetchBookSearchQuery()
+    }
+  }, [refetchBookSearchQuery])
 
   function handleSearchSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -72,7 +70,7 @@ const DiscoverBooksScreen: React.FC<DiscoverBooksScreenProps> = ({ user }) => {
         <BookListUL css={{ marginTop: 20 }}>
           {books.map((book) => (
             <li key={book.id} aria-label={book.title}>
-              <BookRow key={book.id} book={book} user={user} />
+              <BookRow key={book.id} book={book} />
             </li>
           ))}
         </BookListUL>

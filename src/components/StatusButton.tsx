@@ -33,7 +33,6 @@ interface TooltipButtonProps
 }
 
 interface StatusButtonsProps {
-  user: User
   book: Book
 }
 
@@ -78,12 +77,12 @@ const TooltipButton: React.FC<TooltipButtonProps> = ({
   )
 }
 
-const StatusButtons: React.FC<StatusButtonsProps> = ({ user, book }) => {
-  const listItem = useListItem(book.id, user)
+const StatusButtons: React.FC<StatusButtonsProps> = ({ book }) => {
+  const listItem = useListItem(book.id)
 
-  const { mutateAsync: update } = useUpdateListItem(user)
-  const { mutateAsync: remove } = useRemoveListItem(user)
-  const { mutateAsync: create } = useCreateListItem(user)
+  const { mutateAsync: update } = useUpdateListItem()
+  const { mutateAsync: remove } = useRemoveListItem()
+  const { mutateAsync: create } = useCreateListItem()
 
   return (
     <React.Fragment>

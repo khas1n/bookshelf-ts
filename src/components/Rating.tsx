@@ -22,12 +22,11 @@ const visuallyHiddenCSS: CSSObject = {
 }
 interface RatingProps {
   listItem: List
-  user: User
 }
 
-const Rating: React.FC<RatingProps> = ({ listItem, user }) => {
+const Rating: React.FC<RatingProps> = ({ listItem }) => {
   const [isTabbing, setIsTabbing] = React.useState(false)
-  const { mutateAsync: update, isError, error } = useUpdateListItem(user)
+  const { mutateAsync: update, isError, error } = useUpdateListItem()
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
